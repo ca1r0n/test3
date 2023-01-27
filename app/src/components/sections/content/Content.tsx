@@ -22,10 +22,13 @@ function Main() {
     }, [])
 
     const handleDelete = (index: number) => () => {
-        if (rowsSelector.rows[index]?.id == 0) {
+        const row = rowsSelector.rows[index]
+        if (row?.id == 0) {
             dispatch(rowSlice.actions.deleteByIndex(index))
         } else {
-            dispatch(deleteRow(rowsSelector.rows[index]?.id))
+            if (row) {
+                dispatch(deleteRow(row.id))
+            }
         }
     }
 

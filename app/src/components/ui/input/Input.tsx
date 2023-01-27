@@ -4,7 +4,7 @@ import "./Input.scss"
 
 type InputProps = {
     fullWidth?: boolean
-    inputAttr?: InputHTMLAttributes<InputProps>
+    inputAttr?: InputHTMLAttributes<HTMLInputElement>
 }
 const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
     return <input

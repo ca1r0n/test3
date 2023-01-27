@@ -1,6 +1,8 @@
 import {IRowRender} from "../../../storage/slices/row.slice";
 import {FormEvent, useRef, useState} from "react";
+// @ts-ignore
 import DocsPng from "@/assets/icons/docs.png?url"
+// @ts-ignore
 import TrashPng from "@/assets/icons/trash.png?url"
 import {Input} from "../../ui/input/Input";
 
@@ -27,8 +29,8 @@ export const Row = (props: RowProps) => {
         for (let i = 0; i < target.elements.length; i++) {
             if (target.elements[i].tagName == "INPUT") {
                 const input = target.elements[i] as HTMLInputElement
-                row[input.name] = input.type == "text" ? input.value :
-                    input.type == "number" ? Number(input.value) : input.value
+                //@ts-ignore
+                row[input.name] = input.type == "text" ? input.value :Number(input.value)
             }
         }
 

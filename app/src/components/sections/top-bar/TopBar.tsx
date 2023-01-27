@@ -16,6 +16,7 @@ export const TopBar = () => {
             <ProjectIntro
                 Abbreviation={"Аббревиатура"}
                 Name={"Название проекта"}
+                OnClick={() => {}}
             />
             <Tabs />
         </div>
@@ -25,7 +26,7 @@ export const TopBar = () => {
 const IconBar = () => {
     const items: {
         Icon: FC<SVGProps<SVGElement>>,
-        OnClick?: string,
+        OnClick?: () => void,
     }[] = [
         {
             Icon: AppSvg,

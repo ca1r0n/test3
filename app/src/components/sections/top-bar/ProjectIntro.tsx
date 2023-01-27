@@ -1,3 +1,4 @@
+//@ts-ignore
 import ArrowSVG from "@/assets/icons/arrow.png?url"
 import "./ProjectIntro.scss"
 

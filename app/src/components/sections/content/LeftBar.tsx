@@ -1,5 +1,6 @@
 import "./LeftBar.scss"
 import {useState} from "react";
+// @ts-ignore
 import DefaultSVG from "@/assets/icons/default.png?url"
 import classNames from "classnames";
 
