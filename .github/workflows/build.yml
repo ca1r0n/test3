@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,18 +26,21 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
+      
+    - name: Setup Node ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+      
     - name: Build
       working-directory: ./app
       run: |
         yarn
         yarn build
-    - name: Setup Pages
-      uses: actions/configure-pages@v3
+    
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v1
       with:
