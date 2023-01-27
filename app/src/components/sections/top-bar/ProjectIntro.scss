@@ -1,0 +1,28 @@
+.project-intro {
+  height: 44px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  justify-content: space-between;
+
+  &__title, &__sub-title {
+    color: $gray;
+    font-weight: 400;
+  }
+
+  &__title {
+    font-size: 0.875rem;
+  }
+
+  &__sub-title {
+    font-size: 0.625rem;
+  }
+
+  &__intro-left {
+  }
+
+  &__intro-right {
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,13 @@
+.input {
+  border: 1px solid #414144;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  padding: 10px;
+  background: transparent;
+  color: $gray2;
+  box-sizing: border-box;
+
+  &--full-width {
+    width: 100%;
+  }
+}

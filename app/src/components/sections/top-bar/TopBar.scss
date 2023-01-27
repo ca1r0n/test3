@@ -1,0 +1,52 @@
+.top-bar {
+  background: $black;
+
+  &__bot, &__top {
+    border-bottom: 1px $black-border solid;
+  }
+
+  &__top {
+    padding: 0 24px;
+  }
+
+  &__bot, &__top, &__icons, &__navs {
+    display: flex;
+    align-items: center;
+  }
+
+  &__top, &__icons, &__navs {
+    gap: 30px;
+  }
+
+  &__bot {
+    > div {
+      border-right: 1px solid $black-border;
+    }
+  }
+
+  &__icon {
+    cursor: pointer;
+  }
+
+  &__nav {
+    cursor: pointer;
+    padding: 15px 0;
+    position: relative;
+    border-bottom: transparent 2px solid;
+    transition: border 0.1s;
+
+
+    &--active {
+      border-bottom-color: $white;
+
+      .top-bar__nav-title {
+        color: $white;
+      }
+    }
+  }
+
+  &__nav-title {
+    color: $gray;
+    transition: color 0.1s;
+  }
+}

@@ -1,0 +1,13 @@
+.tabs {
+  &__tab {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+  }
+
+  &__title {
+    font-size: 1.125rem;
+  }
+}

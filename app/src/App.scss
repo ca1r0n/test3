@@ -1,0 +1,33 @@
+@font-face {
+  font-family: Roboto;
+  src: url(@/assets/fonts/roboto/Roboto-Regular.ttf) format("truetype");
+  font-weight: 400;
+}
+
+body {
+  background: $black-bg;
+  color: $white;
+  font-family: Roboto;
+  font-weight: 400;
+  height: 100vh;
+}
+
+#root {
+  height: 100%;
+}
+
+._scrollbar {
+  &::-webkit-scrollbar {
+    width: 2px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: blue;
+    border-radius: 4px;
+    border: 3px solid $gray;
+  }
+}
