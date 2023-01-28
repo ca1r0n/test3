@@ -19,6 +19,20 @@ const items: ProjectItemProps[] = [
     {Title: "Камеры"},
     {Title: "Поручения"},
     {Title: "Контрагенты"},
+    {Title: "Объекты"},
+    {Title: "РД"},
+    {Title: "МТО"},
+    {Title: "СМР"},
+    {Title: "График"},
+    {Title: "МиМ"},
+    {Title: "Рабочие"},
+    {Title: "Капвложения"},
+    {Title: "Бюджет"},
+    {Title: "Финансирование"},
+    {Title: "Панорамы"},
+    {Title: "Камеры"},
+    {Title: "Поручения"},
+    {Title: "Контрагенты"},
 ]
 export const LeftBar = () => {
     const [active, setActive] = useState(-1) // TODO: load from redux

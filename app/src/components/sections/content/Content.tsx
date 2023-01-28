@@ -3,7 +3,7 @@ import "./Content.scss"
 import {useEffect, useMemo} from "react";
 import {useAppDispatch, useAppSelector} from "../../../storage/store";
 import {createRow, deleteRow, getListRow, updateRow} from "../../../storage/actions/row.actions";
-import {genEmptyRow, rowSlice} from "../../../storage/slices/row.slice";
+import {genEmptyRow, IRowRender, rowSlice} from "../../../storage/slices/row.slice";
 import {Row} from "./Row";
 import {IRow} from "../../../api/row.api";
 import {heightTree} from "../../../utils/utils";
@@ -31,7 +31,7 @@ function Main() {
         }
     }
 
-    const handleUpdate = (row: IRow, id: number | null) => {
+    const handleUpdate = (row: IRowRender, id: number | null) => {
         if (row.id < 0) {
             dispatch(createRow(row, id))
         } else {
@@ -62,7 +62,8 @@ function Main() {
         <div
             className="content__table"
             style={{
-                ["--level-width" as undefined]: heightRow,
+                //@ts-ignore
+                ["--level-width"]: heightRow,
             }}
         >
             <Columns/>

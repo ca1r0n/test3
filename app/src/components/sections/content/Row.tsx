@@ -53,7 +53,7 @@ export const Row = (props: RowProps) => {
     }
 
     const handleCreateEmpty = useCallback(() => {
-        if (!isEdit && props.onCreateEmpty && props.row) {
+        if (props.onCreateEmpty && props.row && props.row.id > 0) {
             props.onCreateEmpty(props.row.id)
         }
     }, [isEdit])
@@ -189,7 +189,7 @@ export const Row = (props: RowProps) => {
                 key={row.id}
                 {...props}
                 depth={props.depth + 1}
-                parentId={props.row.id}
+                parentId={props.row?.id || null}
                 row={row}
             />
         })}
