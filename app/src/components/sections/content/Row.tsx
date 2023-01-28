@@ -1,138 +1,197 @@
-import {IRowRender} from "../../../storage/slices/row.slice";
-import {FormEvent, useRef, useState} from "react";
+import {FormEvent, useCallback, useMemo, useState} from "react";
 // @ts-ignore
 import DocsPng from "@/assets/icons/docs.png?url"
 // @ts-ignore
 import TrashPng from "@/assets/icons/trash.png?url"
 import {Input} from "../../ui/input/Input";
+import classNames from "classnames";
+import {countTree} from "../../../utils/utils";
+import {IRowRender} from "../../../storage/slices/row.slice";
 
 interface RowProps {
-    Row: IRowRender
-    OnCreate?: () => void
-    OnDelete?: () => void
-    OnUpdate?: (row: IRowRender) => void
-    IsCreate?: boolean
+    row: IRowRender | null
+    parentId: number | null
+    depth: number
+    onCreateEmpty?: (parentId: number) => void
+    onDelete?: (id: number) => void
+    onUpdate?: (row: IRowRender, parentId: number | null) => void
 }
 
 export const Row = (props: RowProps) => {
-    const [isEdit, setIsEdit] = useState(props.IsCreate)
-    const formRef = useRef<HTMLFormElement | null>(null)
+    if (props.row === null) {
+        return null
+    }
+
+    const [isEdit, setIsEdit] = useState(props.row.id < 0)
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        const target = e.target as HTMLFormElement
-        const row: IRowRender = {
-            ...props.Row,
-        }
-
-        for (let i = 0; i < target.elements.length; i++) {
-            if (target.elements[i].tagName == "INPUT") {
-                const input = target.elements[i] as HTMLInputElement
-                //@ts-ignore
-                row[input.name] = input.type == "text" ? input.value :Number(input.value)
+        if (props.onUpdate && props.row) {
+            const row: IRowRender = {
+                ...props.row,
             }
-        }
+            const forEl = e.target as HTMLFormElement
 
-        if (props.OnUpdate) {props.OnUpdate(row)}
+            for (let i = 0; i < forEl.elements.length; i++) {
+                const el = forEl.elements[i]
+                if (el.tagName === "INPUT") {
+                    //@ts-ignore
+                    row[el.name] = el.value
+                }
+            }
+
+            props.onUpdate(row, props.parentId)
+        }
         setIsEdit(false)
     }
 
     const handleDelete = () => {
-        let ok = true
-
-        if (!props.IsCreate) {
-            ok = confirm("Уверены?")
-        }
-
-        if (ok && props.OnDelete) {
-            props.OnDelete()
+        if (props.onDelete && props.row) {
+            props.onDelete(props.row.id)
         }
     }
 
-    const handleCreate = () => {
-        if (!props.IsCreate && props.OnCreate) {
-            props.OnCreate()
+    const handleCreateEmpty = useCallback(() => {
+        if (!isEdit && props.onCreateEmpty && props.row) {
+            props.onCreateEmpty(props.row.id)
         }
-    }
+    }, [isEdit])
 
-    return <form
-        ref={formRef}
-        className={"content__table-row"}
-        onDoubleClick={() => setIsEdit(true)}
-        onSubmit={handleSubmit}
-    >
-        <div className={"content__table-rows"}>
-            <div
-                className="content__table-icons"
-                style={{
-                    marginLeft: `${props.Row.level * 16}px`
-                }}
-            >
-                <img
-                    onClick={handleCreate}
-                    src={DocsPng}
-                    alt="create"
-                    className={"content__table-icon content__table-icon--show"}
-                />
-                <img
-                    onClick={handleDelete}
-                    src={TrashPng}
-                    alt="create"
-                    className={"content__table-icon"}
-                />
+    const heightLine = useMemo(() => {
+        if (!props.row) {
+            return ""
+        }
+
+        let lastNotNull: IRowRender | null = null
+
+        for (let i = props.row.child.length-1; i >= 0; i--) {
+            if (props.row.child[i] !== null) {
+                lastNotNull = props.row.child[i]
+                break
+            }
+        }
+
+        let count = countTree(props.row) - countTree(lastNotNull)
+
+        let isEmpty = true
+        props.row.child.forEach(row => {
+            if (row !== null) {
+                isEmpty = false
+            }
+        })
+
+        if (isEmpty)  {
+            count--
+        }
+
+
+        return `${(count * 63) - 8}px`
+    }, [props.row.child])
+
+    return <>
+        <form
+            className={"content__table-row"}
+            onDoubleClick={() => setIsEdit(true)}
+            onSubmit={handleSubmit}
+        >
+            <div className={"content__table-rows"}>
+                <div
+                    className="content__table-icons"
+                    style={{
+                        marginLeft: `${props.depth * 20}px`
+                    }}
+                >
+                    <div className={"content__table-create"}>
+                        <img
+                            onClick={handleCreateEmpty}
+                            src={DocsPng}
+                            alt="create"
+                            className={"content__table-icon content__table-icon--show"}
+                        />
+                        <div
+                            className={classNames(
+                                "content__table-tree",
+                                props.depth == 0 ? "content__table-tree--root" : ""
+                            )}
+                            style={{
+                                height: heightLine,
+                            }}
+                        />
+                    </div>
+                    <img
+                        onClick={handleDelete}
+                        src={TrashPng}
+                        alt="create"
+                        className={"content__table-icon"}
+                    />
+
+                </div>
             </div>
-        </div>
-        <div className={"content__table-rows"}>
-            {isEdit ? <Input
-                inputAttr={{
-                    type: "text",
-                    defaultValue: props.Row.rowName,
-                    name: "rowName",
-                }}
-                fullWidth
-            /> : props.Row.rowName}
-        </div>
-        <div className={"content__table-rows"}>
-            {isEdit ? <Input
-                inputAttr={{
-                    type: "number",
-                    defaultValue: props.Row.salary,
-                    name: "salary",
-                }}
-                fullWidth
-            /> : props.Row.salary}
-        </div>
-        <div className={"content__table-rows"}>
-            {isEdit ? <Input
-                inputAttr={{
-                    type: "number",
-                    defaultValue: props.Row.equipmentCosts,
-                    name: "equipmentCosts",
-                }}
-                fullWidth
-            /> : props.Row.equipmentCosts}
-        </div>
-        <div className={"content__table-rows"}>
-            {isEdit ? <Input
-                inputAttr={{
-                    type: "number",
-                    defaultValue: props.Row.overheads,
-                    name: "overheads",
-                }}
-                fullWidth
-            /> : props.Row.overheads}
-        </div>
-        <div className={"content__table-rows"}>
-            {isEdit ? <Input
-                inputAttr={{
-                    type: "number",
-                    defaultValue: props.Row.estimatedProfit,
-                    name: "estimatedProfit",
-                }}
-                fullWidth
-            /> : props.Row.estimatedProfit}
-        </div>
-        <button type="submit" hidden></button>
-    </form>
+            <div className={"content__table-rows"}>
+                {isEdit ? <Input
+                    inputAttr={{
+                        type: "text",
+                        defaultValue: props.row.rowName,
+                        name: "rowName",
+                    }}
+                    fullWidth
+                /> : props.row.rowName}
+            </div>
+            <div className={"content__table-rows"}>
+                {isEdit ? <Input
+                    inputAttr={{
+                        type: "number",
+                        defaultValue: props.row.salary,
+                        name: "salary",
+                    }}
+                    fullWidth
+                /> : props.row.salary}
+            </div>
+            <div className={"content__table-rows"}>
+                {isEdit ? <Input
+                    inputAttr={{
+                        type: "number",
+                        defaultValue: props.row.equipmentCosts,
+                        name: "equipmentCosts",
+                    }}
+                    fullWidth
+                /> : props.row.equipmentCosts}
+            </div>
+            <div className={"content__table-rows"}>
+                {isEdit ? <Input
+                    inputAttr={{
+                        type: "number",
+                        defaultValue: props.row.overheads,
+                        name: "overheads",
+                    }}
+                    fullWidth
+                /> : props.row.overheads}
+            </div>
+            <div className={"content__table-rows"}>
+                {isEdit ? <Input
+                    inputAttr={{
+                        type: "number",
+                        defaultValue: props.row.estimatedProfit,
+                        name: "estimatedProfit",
+                    }}
+                    fullWidth
+                /> : props.row.estimatedProfit}
+            </div>
+            <button type="submit" hidden></button>
+        </form>
+        {props.row.child.map((row) => {
+            if (row === null) {
+                return null
+            }
+
+            return <Row
+                key={row.id}
+                {...props}
+                depth={props.depth + 1}
+                parentId={props.row.id}
+                row={row}
+            />
+        })}
+    </>
 }

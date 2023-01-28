@@ -22,7 +22,7 @@ export interface IRecalculatedRows {
 }
 
 export type ICreateRow = Omit<IRow, "id" | "child" | "total"> & {
-    parentId: number
+    parentId: number | null
 }
 export type IUpdateRow = Omit<IRow, "id" | "child" | "total">
 

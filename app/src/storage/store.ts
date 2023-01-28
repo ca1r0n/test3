@@ -1,10 +1,12 @@
 import {combineReducers, configureStore} from "@reduxjs/toolkit";
 import {rowSlice} from "./slices/row.slice";
 import {TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
+import {notifySlice} from "./slices/notify.slice";
 
 
 const rootReducer = combineReducers({
     row: rowSlice.reducer,
+    notify: notifySlice.reducer,
 })
 export const setupStore = () => {
     return configureStore({

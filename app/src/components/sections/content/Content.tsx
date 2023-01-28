@@ -1,10 +1,12 @@
 import {LeftBar} from "./LeftBar";
 import "./Content.scss"
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
 import {useAppDispatch, useAppSelector} from "../../../storage/store";
 import {createRow, deleteRow, getListRow, updateRow} from "../../../storage/actions/row.actions";
-import {IRowRender, rowSlice} from "../../../storage/slices/row.slice";
+import {genEmptyRow, rowSlice} from "../../../storage/slices/row.slice";
 import {Row} from "./Row";
+import {IRow} from "../../../api/row.api";
+import {heightTree} from "../../../utils/utils";
 
 export const Content = () => {
     return <div className="content">
@@ -21,45 +23,68 @@ function Main() {
         dispatch(getListRow())
     }, [])
 
-    const handleDelete = (index: number) => () => {
-        const row = rowsSelector.rows[index]
-        if (row?.id == 0) {
-            dispatch(rowSlice.actions.deleteByIndex(index))
+    const handleDelete = (id: number) => {
+        if (id < 0) {
+            dispatch(rowSlice.actions.deleteById(id))
         } else {
-            if (row) {
-                dispatch(deleteRow(row.id))
-            }
+            dispatch(deleteRow(id))
         }
     }
 
-    const handleUpdate = (index: number)  => (row: IRowRender) => {
-        if (row.id == 0) {
-            dispatch(createRow(row, index))
+    const handleUpdate = (row: IRow, id: number | null) => {
+        if (row.id < 0) {
+            dispatch(createRow(row, id))
         } else {
             dispatch(updateRow(row))
         }
     }
 
-    const handleCreate = (id: number) => ()  => {
-        dispatch(rowSlice.actions.createEmpty(id))
+    const handleCreateEmpty = (parentId: number) => {
+        dispatch(rowSlice.actions.createEmpty({
+            parentId: parentId,
+        }))
     }
 
+    const heightRow = useMemo(() => {
+        let max = 0
+
+        rowsSelector.rows.forEach((row) => {
+            const h = heightTree(row)
+            if (h > max) {
+                max = h
+            }
+        })
+
+        return `${max * 30}px`
+    }, [rowsSelector.rows])
 
     return <div className={"content__main _scrollbar"}>
-        <div className="content__table">
+        <div
+            className="content__table"
+            style={{
+                ["--level-width" as undefined]: heightRow,
+            }}
+        >
             <Columns/>
-            {rowsSelector.rows.map((item,index) => {
+            {!rowsSelector.rows.length && <Row
+                row={genEmptyRow()}
+                onUpdate={handleUpdate}
+                parentId={null}
+                depth={0}
+            />}
+            {rowsSelector.rows.map((item) => {
                 if (!item) {
                     return null
                 }
 
                 return <Row
                     key={item.id}
-                    Row={item}
-                    OnUpdate={handleUpdate(index)}
-                    OnDelete={handleDelete(index)}
-                    OnCreate={handleCreate(item.id)}
-                    IsCreate={item.id == 0}
+                    row={item}
+                    onCreateEmpty={handleCreateEmpty}
+                    onDelete={handleDelete}
+                    onUpdate={handleUpdate}
+                    parentId={null}
+                    depth={0}
                 />
             })}
         </div>
